@@ -2,7 +2,7 @@ package ru.it_soft.bigdata.tmdb_movies.tools
 
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
 import org.apache.spark.sql.{Row, SparkSession}
-import org.apache.spark.sql.functions.{col, udf}
+import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types.LongType
 
 object Main extends App {
@@ -39,4 +39,25 @@ object Main extends App {
 
   val df3 = df2.groupBy("genres").avg()
 // df3.show(truncate = false)
+
+val encoder1 = RowEncoder(
+    StructType(
+      List(
+        StructField("genre_id", IntegerType, true),
+        StructField("genre_name", StringType, true),
+        StructField("average_revenue", DoubleType, true)
+      )
+    )
+  )
+ 
+ val genre_pattern = """\{"id"\: ([0-9]+), "name"\: "([A-Za-z ]+)"}""".r
+  val df4 = df3.map(r => {
+    val genre_pattern(id, name) = r.getString(0)
+    Row(id.toInt, name, r.getDouble(1))
+  } )(encoder1)
+ 
+// df4.show(df4.count.toInt)
+
+WriterToPostgres.saveToPostgres(df,tableWithScheme),df4, "tableName"
+
 }
