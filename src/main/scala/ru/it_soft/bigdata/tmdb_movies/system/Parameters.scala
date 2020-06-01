@@ -8,12 +8,4 @@ object Parameters {
 
 class Parameters(args: Array[String], fs: FileSystem) extends Serializable {
   val EMPTY_PATH = "/user/..."
-  private val paramMap = args
-    .map(param => {
-      val pair = param.split("=", -1)
-      if (pair.length == 3)
-        (pair(0), pair(1) + "=" + pair(2))
-      else
-        (pair(0), pair(1))
-    }).toMap
-}
+ }

@@ -66,67 +66,13 @@
                 --conf spark.yarn.maxAppAttempts=1
                 --queue ${QUEUE_NAME}
             </spark-opts>
-            <arg>STAGE=1</arg>
-            <arg>DATE_1D_yyyyMMdd=${DATE_1D_yyyyMMdd}</arg>
-         </spark>
-        <ok to="agg_tmdb_movies"/>
-        <error to="kill"/>
-    </action>
-
- 
-    <action name="agg_tmdb_movies" cred="hive_cred">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${JOB_TRACKER}</job-tracker>
-            <name-node>${NAME_NODE}</name-node>
-            <job-xml>${WORKING_DIR}/hive-site.xml</job-xml>
-            <master>yarn</master>
-            <name>agg_tmdb_movies</name>
-            <class>${MAIN_CLASS}</class>
-            <jar>${TARGET_JAR}</jar>
-            <spark-opts>
-                --deploy-mode cluster
-                --driver-memory 5G
-                --driver-cores 4
-                --executor-cores 4
-                --executor-memory 4G
-                --conf spark.dynamicAllocation.enabled=true
-                --conf spark.dynamicAllocation.minExecutors=10
-                --conf spark.dynamicAllocation.maxExecutors=30
-                --conf spark.shuffle.service.enabled=true
-                --conf spark.shuffle.consolidateFiles=true
-                --conf spark.yarn.executor.memoryOverhead=4096
-                --conf spark.shuffle.consolidateFiles=true
-                --conf spark.rpc.message.maxSize=640
-                --conf spark.serializer=org.apache.spark.serializer.KryoSerializer
-                --conf spark.kryoserializer.buffer.max=1024
-                --conf spark.sql.shuffle.partitions=50
-                --conf spark.yarn.maxAppAttempts=1
-                --conf spark.driver.maxResultSize=2048
-                --queue ${QUEUE_NAME}
-            </spark-opts>
-            <arg>STAGE=2</arg>
-            <arg>DATE_1D_ddMMyyyy=${DATE_1D_ddMMyyyy}</arg>
-        </spark>
-        <ok to="alter_TMDB_MOVIES"/>
-        <error to="kill"/>
-    </action>
-
-    <action name="alter_TMDB_MOVIES" cred="hive_cred">
-        <hive xmlns="uri:oozie:hive-action:0.2">
-            <job-tracker>${JOB_TRACKER}</job-tracker>
-            <name-node>${NAME_NODE}</name-node>
-            <script>hive/alter_TMDB_MOVIES.sql</script>
-             <param>DATE_12M_ddMMyyyy=${DATE_12M_ddMMyyyy}</param>
-        </hive>
+           </spark>
         <ok to="set_flag_tmdb_movies"/>
         <error to="kill"/>
     </action>
 
     <action name="set_flag_tmdb_movies">
-        <fs>
-            <touchz path="${PATH_AGG_TMDB_MOVIES}/date=${DATE_1D_ddMMyyyy}/_SUCCESS" />
-        </fs>
-        <ok to="end"/>
+          <ok to="end"/>
         <error to="kill"/>
     </action>
 

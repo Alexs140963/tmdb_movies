@@ -17,8 +17,6 @@
             <app-path>${WORKING_DIR}</app-path>
             <configuration>
                 <property>
-                    <name>DATE_12M</name>
-                    <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), -12, 'MONTH'), 'yyyy-MM-dd')}</value>
                 </property>
             </configuration>
         </workflow>
