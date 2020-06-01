@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coordinator-app
+        xmlns="uri:oozie:coordinator:0.4"
+        xmlns:sla="uri:oozie:sla:0.2"
+        name="${PROJECT_NAME}"
+        frequency="${coord:month(1)}"
+        timezone="Europe/Moscow"
+        start="${JOB_START}"
+        end="${JOB_END}">
+
+    <controls>
+        <timeout>${coord:days(1)}</timeout>
+    </controls>
+
+    <action>
+        <workflow>
+            <app-path>${WORKING_DIR}</app-path>
+            <configuration>
+                <property>
+                    <name>DATE_12M</name>
+                    <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), -12, 'MONTH'), 'yyyy-MM-dd')}</value>
+                </property>
+            </configuration>
+        </workflow>
+        <sla:info>
+            <sla:nominal-time>${coord:nominalTime()}</sla:nominal-time>
+			<sla:should-start>${1 * MONTH}</sla:should-start>
+            <sla:should-end>${1 * MONTH}</sla:should-end>
+            <sla:max-duration>${1 * MONTH}</sla:max-duration>
+            <sla:alert-events>end_miss,duration_miss</sla:alert-events>
+            <sla:alert-contact>${MAIL}</sla:alert-contact>
+        </sla:info>
+    </action>
+</coordinator-app>
