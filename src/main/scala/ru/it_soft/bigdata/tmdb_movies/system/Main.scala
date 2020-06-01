@@ -58,6 +58,6 @@ val encoder1 = RowEncoder(
  
 // df4.show(df4.count.toInt)
 
-WriterToPostgres.saveToPostgres(df,tableWithScheme),df4, "tableName"
+WriterToPostgres.saveToPostgres((df,tableWithScheme),df4, "tableName")
 
 }
