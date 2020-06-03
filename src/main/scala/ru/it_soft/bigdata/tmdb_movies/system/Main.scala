@@ -1,9 +1,12 @@
-package ru.it_soft.bigdata.tmdb_movies.tools
+package ru.it_soft.bigdata.tmdb_movies.system
 
+import ru.it_soft.bigdata.tmdb_movies.tools.Parameters
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
 import org.apache.spark.sql.{Row, SparkSession}
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types.LongType
+import org.apache.spark.sql.{DataFrame, SaveMode}
+import java.util.Properties
 
 object Main extends App {
 
@@ -12,6 +15,7 @@ object Main extends App {
     .config("spark.master", "local")
     .getOrCreate()
 
+  val properties = Parameters.instance(args)
   import spark.implicits._
 
   val sc = spark.sparkContext
@@ -20,7 +24,7 @@ object Main extends App {
     .option("inferSchema", "true")
     .option("quote", "\"")
     .option("escape", "\"")
-    .load("oozie/tmdb_movies/dim/tmdb_5000_movies.csv")
+    .load(properties.SrcPath)
     .na.drop
 
 //  df.show(10)
@@ -58,6 +62,13 @@ val encoder1 = RowEncoder(
  
 // df4.show(df4.count.toInt)
 
-WriterToPostgres.saveToPostgres((df,tableWithScheme),df4, "tableName")
+  val url: String = s"jdbc:postgresql://localhost/${properties.DatabaseName}"
+  val props = new Properties()
+  props.setProperty("user", properties.UserName)
+  props.setProperty("password", properties.Password)
+  props.put("driver", "org.postgresql.Driver")
+  df4.write
+    .mode(SaveMode.Overwrite)
+    .jdbc(url, properties.tableName, props)
 
 }
